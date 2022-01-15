@@ -17,6 +17,7 @@ import androidx.core.app.ActivityCompat
 import com.google.android.material.snackbar.Snackbar
 import infnet.android.smpa_permissao_serv.databinding.FragmentFirstBinding
 import java.io.*
+import java.util.*
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -38,10 +39,12 @@ class FirstFragment : Fragment() {
 
         override fun onProviderDisabled(provider: String) {
             super.onProviderDisabled(provider)
+            val d = 2
         }
 
         override fun onProviderEnabled(provider: String) {
             super.onProviderEnabled(provider)
+            val d = 2
         }
 
 
@@ -55,6 +58,52 @@ class FirstFragment : Fragment() {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
 
+    }
+
+    private fun gravarLocalizacaoArquivo(ultimaLocal:Location) {
+        val caminhoSdCard = requireActivity()?.getExternalFilesDir(null)
+        myToast(caminhoSdCard.toString())
+        val tempoAtual= ultimaLocal.time
+        val file = File(caminhoSdCard, "$tempoAtual.crd")
+
+        if (file.exists()) {
+            file.delete()
+        } else {
+            try {
+                val os: OutputStream = FileOutputStream(file)
+
+                os.write("${ultimaLocal.toString()}".toByteArray())
+                os.write("\n".toByteArray())
+
+                os.close()
+
+            } catch (e: IOException) {
+                Log.d("Permissao", "Erro de escrita em arquivo")
+            }
+        }
+    }
+
+    private fun lerArquvo() {
+        val caminhoSdCard = requireActivity()?.getExternalFilesDir(null)
+
+        var linha: String?
+        var textao = StringBuilder()
+        textao.append('\n')
+        try {
+
+            val fl = File(caminhoSdCard, "DemoFile.txt")
+            val arquivo = FileReader(fl)
+
+            val buffer = BufferedReader(arquivo)
+
+            /*var linhavazia=buffer.readLine().also { linha = it }*/
+            while (buffer.readLine().also { linha = it } != null) {
+                myToast(linha)
+            }
+            buffer.close()
+        } catch (ero: IOException) {
+            myToast("$ero")
+        }
     }
 
     private fun ligaListenerProvedorDisponivel(
@@ -93,22 +142,31 @@ class FirstFragment : Fragment() {
             mostraRequisicaoGPS()
             return false
         }else{
-            if(!isGpsLigado){
+
+
+            lm.requestLocationUpdates(provedorVar, 2000L,
+                0f, listnr)
+            var ultimaLocal = lm.getLastKnownLocation(provedorVar)
+
+            if (ultimaLocal == null) {
                 provedorVar=LocationManager.NETWORK_PROVIDER
                 if(!lm.isProviderEnabled(provedorVar)){
                     mostraRequisicaoGPS()
                     return false
                 }
-            }
 
-            lm.requestLocationUpdates(provedorVar, 2000L,
-                0f, listnr)
-            val ultimaLocal = lm.getLastKnownLocation(provedorVar)
-            if (ultimaLocal != null) {
-                binding?.txtTelaRequisitaLocalizacao.text =
-                    "Ultima Localizaçao : ${ultimaLocal.altitude}, " +
-                            "${ultimaLocal.longitude}"
+                lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000L,
+                    0f, listnr)
+                ultimaLocal = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
             }
+            val ts=
+            ultimaLocal?.let{
+                binding?.txtTelaRequisitaLocalizacao.text =
+                    "Ultima Localizaçao : ${it.altitude}, " +
+                            "${it.longitude}"
+                gravarLocalizacaoArquivo(it)
+            }
+            val d =2
 
         }
 
@@ -130,47 +188,6 @@ class FirstFragment : Fragment() {
             Toast.makeText(requireContext(), text, Toast.LENGTH_LONG + 3223).show()
     }
 
-    private fun createDeleteFile() {
-        val caminhoSdCard = requireActivity()?.getExternalFilesDir(null)
-
-        val file = File(caminhoSdCard, "DemoFile.txt")
-        if (file.exists()) {
-            file.delete()
-        } else {
-            try {
-                val os: OutputStream = FileOutputStream(file)
-                os.write("Pequeno Teste".toByteArray())
-                os.write("\n".toByteArray())
-                os.close()
-
-            } catch (e: IOException) {
-                Log.d("Permissao", "Erro de escrita em arquivo")
-            }
-        }
-    }
-
-    private fun lerArquvo() {
-        val caminhoSdCard = requireActivity()?.getExternalFilesDir(null)
-
-        var linha: String?
-        var textao = StringBuilder()
-        textao.append('\n')
-        try {
-
-            val fl = File(caminhoSdCard, "DemoFile.txt")
-            val arquivo = FileReader(fl)
-
-            val buffer = BufferedReader(arquivo)
-
-            /*var linhavazia=buffer.readLine().also { linha = it }*/
-            while (buffer.readLine().also { linha = it } != null) {
-                myToast(linha)
-            }
-            buffer.close()
-        } catch (ero: IOException) {
-            myToast("$ero")
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
