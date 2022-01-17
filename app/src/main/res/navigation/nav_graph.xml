@@ -3,11 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/GravarLocalFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
-        android:name="infnet.android.smpa_permissao_serv.FirstFragment"
+        android:id="@+id/GravarLocalFragment"
+        android:name="infnet.android.smpa_permissao_serv.GravarLocalFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
         <action
@@ -15,17 +15,12 @@
             app:destination="@id/localHoraFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="infnet.android.smpa_permissao_serv.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second"/>
-    <fragment
         android:id="@+id/localHoraFragment"
         android:name="infnet.android.smpa_permissao_serv.LocalHoraFragment"
         android:label="fragment_localhora_list"
         tools:layout="@layout/fragment_localhora_list" >
         <action
             android:id="@+id/action_localHoraFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            app:destination="@id/GravarLocalFragment" />
     </fragment>
 </navigation>
