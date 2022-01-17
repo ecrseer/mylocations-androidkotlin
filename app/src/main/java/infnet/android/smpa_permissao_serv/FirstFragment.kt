@@ -38,12 +38,12 @@ class FirstFragment : Fragment() {
         }
 
         override fun onProviderDisabled(provider: String) {
-            super.onProviderDisabled(provider)
+            //super.onProviderDisabled(provider)
             val d = 2
         }
 
         override fun onProviderEnabled(provider: String) {
-            super.onProviderEnabled(provider)
+            //super.onProviderEnabled(provider)
             val d = 2
         }
 
@@ -72,7 +72,10 @@ class FirstFragment : Fragment() {
             try {
                 val os: OutputStream = FileOutputStream(file)
 
-                os.write("${ultimaLocal.toString()}".toByteArray())
+                os.write("latitude: ${ultimaLocal.latitude}".toByteArray())
+                os.write("\n".toByteArray())
+
+                os.write("longitude: ${ultimaLocal.longitude}".toByteArray())
                 os.write("\n".toByteArray())
 
                 os.close()
@@ -84,7 +87,7 @@ class FirstFragment : Fragment() {
     }
 
     private fun lerArquvo() {
-        val caminhoSdCard = requireActivity()?.getExternalFilesDir(null)
+        val caminhoSdCard:File? = requireActivity()?.getExternalFilesDir(null)
 
         var linha: String?
         var textao = StringBuilder()
@@ -117,9 +120,9 @@ class FirstFragment : Fragment() {
         fun mostraRequisicaoGPS(){
             val REQUEST_PERMISSION_CODE = 128
 
-            Snackbar.make(view, "GPS desativado, clique aqui para habilitar",
+            Snackbar.make(view, "GPS desativado, ative para salvar a localizaçao",
                 Snackbar.LENGTH_SHORT)
-                .setAction("Habilita GPS") {
+                .setAction("Permitir GPS") {
                     ActivityCompat.requestPermissions(
                         requireActivity(), arrayOf(
                             Manifest
@@ -166,7 +169,7 @@ class FirstFragment : Fragment() {
                             "${it.longitude}"
                 gravarLocalizacaoArquivo(it)
             }
-            val d =2
+            val d = 2
 
         }
 
@@ -187,20 +190,29 @@ class FirstFragment : Fragment() {
         if (text != null)
             Toast.makeText(requireContext(), text, Toast.LENGTH_LONG + 3223).show()
     }
+    private fun lerPasta(){
+        var gpath: Array<File>? = requireActivity().getExternalFilesDir(null)?.listFiles()
+        var arquivosCrd = mutableListOf<File>()
+        if (gpath != null) {
+            var bigstr = ""
+            for (file in gpath){
+                if(file.name.endsWith(".crd",true) ){
+                    arquivosCrd.add(file)
 
+                    bigstr+="\n ${file.name}"
+                }
+            }
+            myToast(bigstr)
+        }
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
 
         binding.buttonFirst.setOnClickListener {
-
             ligaLocalizacaoListener(it)
-            // createDeleteFile()
-            /*startActivity(
-                    Intent(requireActivity(),PermissaoActivity::class.java)
-                )*/
-            //findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
         }
         binding.lerArqv.setOnClickListener {
             lerArquvo()
