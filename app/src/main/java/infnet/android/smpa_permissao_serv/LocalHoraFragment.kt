@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.get
-import infnet.android.smpa_permissao_serv.placeholder.PlaceholderContent
 
 /**
  * A fragment representing a list of Items.

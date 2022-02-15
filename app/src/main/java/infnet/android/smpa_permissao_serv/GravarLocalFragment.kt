@@ -2,11 +2,13 @@ package infnet.android.smpa_permissao_serv
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -17,7 +19,6 @@ import androidx.core.app.ActivityCompat
 import com.google.android.material.snackbar.Snackbar
 import infnet.android.smpa_permissao_serv.databinding.FragmentFirstBinding
 import java.io.*
-import java.util.*
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -29,23 +30,15 @@ class GravarLocalFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    val listnr = object : LocationListener {
+    private lateinit var meuLocationManager:LocationManager
+    val meuLocationListener = object : LocationListener {
 
         override fun onLocationChanged(location: Location) {
-            Log.d("LOLOL", "EITAITA")
-
-            val d = 0;
+            Log.d("TD", "TD")
         }
 
-        override fun onProviderDisabled(provider: String) {
-            //super.onProviderDisabled(provider)
-            val d = 2
-        }
-
-        override fun onProviderEnabled(provider: String) {
-            //super.onProviderEnabled(provider)
-            val d = 2
-        }
+        override fun onProviderDisabled(provider: String) {        }
+        override fun onProviderEnabled(provider: String) {        }
 
 
     }
@@ -85,27 +78,17 @@ class GravarLocalFragment : Fragment() {
             }
         }
     }
+    private val REQUEST_CAPTURE_IMAGE = 100
 
-    private fun lerArquvo() {
-        val caminhoSdCard:File? = requireActivity()?.getExternalFilesDir(null)
-
-        var linha: String?
-        var textao = StringBuilder()
-        textao.append('\n')
-        try {
-
-            val fl = File(caminhoSdCard, "DemoFile.txt")
-            val arquivo = FileReader(fl)
-
-            val buffer = BufferedReader(arquivo)
-
-            /*var linhavazia=buffer.readLine().also { linha = it }*/
-            while (buffer.readLine().also { linha = it } != null) {
-                myToast(linha)
-            }
-            buffer.close()
-        } catch (ero: IOException) {
-            myToast("$ero")
+    fun onCameraClick(view: View?){
+        val pictureIntent = Intent(
+            MediaStore.ACTION_IMAGE_CAPTURE
+        )
+        if (pictureIntent.resolveActivity(requireActivity().packageManager) != null) {
+            startActivityForResult(
+                pictureIntent,
+                REQUEST_CAPTURE_IMAGE
+            )
         }
     }
 
@@ -127,14 +110,12 @@ class GravarLocalFragment : Fragment() {
                         requireActivity(), arrayOf(
                             Manifest
                                 .permission.ACCESS_FINE_LOCATION
-                        ), REQUEST_PERMISSION_CODE
-                    )
-                }.show()
+                        ), REQUEST_PERMISSION_CODE  )  }.show()
         }
 
         if (ActivityCompat.checkSelfPermission(
                 contxt,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
             &&
             ActivityCompat.checkSelfPermission(
@@ -145,10 +126,8 @@ class GravarLocalFragment : Fragment() {
             mostraRequisicaoGPS()
             return false
         }else{
-
-
             lm.requestLocationUpdates(provedorVar, 2000L,
-                0f, listnr)
+                0f, meuLocationListener)
             var ultimaLocal = lm.getLastKnownLocation(provedorVar)
 
             if (ultimaLocal == null) {
@@ -159,7 +138,7 @@ class GravarLocalFragment : Fragment() {
                 }
 
                 lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 2000L,
-                    0f, listnr)
+                    0f, meuLocationListener)
                 ultimaLocal = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
             }
             val ts=
@@ -169,54 +148,41 @@ class GravarLocalFragment : Fragment() {
                             "${it.longitude}"
                 gravarLocalizacaoArquivo(it)
             }
-            val d = 2
 
         }
 
         return true
     }
 
-
-    private fun ligaLocalizacaoListener(view: View) {
-        val lm = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        //val gpsHabilitado:Boolean=lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
-           ligaListenerProvedorDisponivel(lm,  listnr, view)
-
-    }
-
-
-
     private fun myToast(text: String?) {
         if (text != null)
             Toast.makeText(requireContext(), text, Toast.LENGTH_LONG + 3223).show()
     }
-    private fun lerPasta(){
-        var gpath: Array<File>? = requireActivity().getExternalFilesDir(null)?.listFiles()
-        var arquivosCrd = mutableListOf<File>()
-        if (gpath != null) {
-            var bigstr = ""
-            for (file in gpath){
-                if(file.name.endsWith(".crd",true) ){
-                    arquivosCrd.add(file)
 
-                    bigstr+="\n ${file.name}"
-                }
-            }
-            myToast(bigstr)
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        meuLocationManager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        binding.buttonFirst.setOnClickListener {
+            //onCameraClick(it)
+            ligaListenerProvedorDisponivel(meuLocationManager,  meuLocationListener,it)
         }
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-
-        binding.buttonFirst.setOnClickListener {
-            ligaLocalizacaoListener(it)
-        }
-        binding.lerArqv.setOnClickListener {
-            lerArquvo()
-        }
+    override fun onPause() {
+        super.onPause()
+        println("removendo listener parar consumo de bateria")
+        meuLocationManager.removeUpdates(meuLocationListener)
     }
 
     override fun onDestroyView() {

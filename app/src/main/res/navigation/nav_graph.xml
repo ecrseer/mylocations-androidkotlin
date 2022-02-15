@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/localHoraFragment"
         android:name="infnet.android.smpa_permissao_serv.LocalHoraFragment"
-        android:label="fragment_localhora_list"
+        android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_localhora_list" >
         <action
             android:id="@+id/action_localHoraFragment_to_FirstFragment"

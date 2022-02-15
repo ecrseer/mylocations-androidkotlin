@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
-import infnet.android.smpa_permissao_serv.placeholder.PlaceholderContent.PlaceholderItem
 import infnet.android.smpa_permissao_serv.databinding.FragmentLocalhoraBinding
 import java.text.SimpleDateFormat
 import java.util.*
