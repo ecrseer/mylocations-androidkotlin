@@ -17,27 +17,7 @@ class LocalHoraViewModel : ViewModel() {
 
     )
 
-    private fun lerArquvo(caminhoSdCard:File?) {
 
-        var linha: String?
-        var textao = StringBuilder()
-        textao.append('\n')
-        try {
-
-            val fl = File(caminhoSdCard, "DemoFile.txt")
-            val arquivo = FileReader(fl)
-
-            val buffer = BufferedReader(arquivo)
-
-            /*var linhavazia=buffer.readLine().also { linha = it }*/
-            while (buffer.readLine().also { linha = it } != null) {
-                //myToast(linha)
-            }
-            buffer.close()
-        } catch (ero: IOException) {
-            //myToast("$ero")
-        }
-    }
 
     private fun arquivoCrdParaLocation(file:File): Location {
         val localHora = Location("")

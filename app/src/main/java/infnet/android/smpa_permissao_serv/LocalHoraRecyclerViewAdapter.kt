@@ -11,10 +11,7 @@ import infnet.android.smpa_permissao_serv.databinding.FragmentLocalhoraBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-/**
- * [RecyclerView.Adapter] that can display a [PlaceholderItem].
- * TODO: Replace the implementation with code for your data type.
- */
+
 class LocalHoraRecyclerViewAdapter(
     private val values: MutableList<Location>
 ) : RecyclerView.Adapter<LocalHoraRecyclerViewAdapter.ViewHolder>() {

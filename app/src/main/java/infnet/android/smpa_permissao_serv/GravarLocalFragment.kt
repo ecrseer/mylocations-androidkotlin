@@ -78,19 +78,7 @@ class GravarLocalFragment : Fragment() {
             }
         }
     }
-    private val REQUEST_CAPTURE_IMAGE = 100
 
-    fun onCameraClick(view: View?){
-        val pictureIntent = Intent(
-            MediaStore.ACTION_IMAGE_CAPTURE
-        )
-        if (pictureIntent.resolveActivity(requireActivity().packageManager) != null) {
-            startActivityForResult(
-                pictureIntent,
-                REQUEST_CAPTURE_IMAGE
-            )
-        }
-    }
 
     private fun ligaListenerProvedorDisponivel(
         lm: LocationManager,  listener: LocationListener, view: View
